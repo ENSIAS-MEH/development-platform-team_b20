@@ -7,7 +7,6 @@ Titre du projet : Application sociale d’organisation d’événements intellig
 Description du projet :
 Ce projet consiste à développer une application web permettant aux jeunes de créer, découvrir et participer à des événements correspondant à leurs centres d’intérêt. 
 La plateforme facilite l’interaction sociale grâce aux commentaires, partages et recommandations d’événements basées sur les préférences des utilisateurs et leur historique de participation. 
-L’application sera conçue selon une architecture REST pour une gestion efficace des utilisateurs, événements et interactions.
 
 Acteurs :
 
