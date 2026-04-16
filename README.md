@@ -1,3 +1,5 @@
+Membres : Ben Ayad Nizar, Bourhim Issam, Belhaj hamza, Hatim Brahim
+
 Smart Social Event Organizer
 
 Thème : Applications sociales et interactives pour les jeunes
