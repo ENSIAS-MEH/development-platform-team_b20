@@ -26,6 +26,6 @@ Exigences fonctionnelles :
 
 Stack technologique :
 
-- Backend : Jakarata / Spring Boot
-- Frontend : HTML, CSS, JavaScript, React
+- Backend : Spring Boot
+- Frontend : React
 - Base de données : MySQL
