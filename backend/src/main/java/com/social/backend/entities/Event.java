@@ -1,5 +1,4 @@
-package com.example.events.entity;
-
+package com.social.backend.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
