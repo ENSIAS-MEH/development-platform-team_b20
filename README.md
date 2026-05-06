@@ -28,4 +28,4 @@ Stack technologique :
 
 - Backend : Spring Boot
 - Frontend : React
-- Base de données : MySQL
+- Base de données : PostgreSQL
