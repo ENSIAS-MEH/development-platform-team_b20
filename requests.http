@@ -1,0 +1,19 @@
+### --- PARTICIPATION TESTS ---
+
+### Join event (use a real eventId from your events table, and the userId from above)
+POST http://localhost:8080/api/events/1/join?userId=1
+
+### List participants
+GET http://localhost:8080/api/events/1/participants
+
+### Try joining again (should fail with "User already joined this event")
+POST http://localhost:8080/api/events/1/join?userId=1
+
+### Count participants
+GET http://localhost:8080/api/events/1/participants/count
+
+### Leave event
+DELETE http://localhost:8080/api/events/1/leave?userId=1
+
+### Confirm the participant is gone
+GET http://localhost:8080/api/events/1/participants
