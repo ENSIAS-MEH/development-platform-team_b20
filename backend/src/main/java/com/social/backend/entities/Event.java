@@ -1,64 +1,56 @@
 package com.social.backend.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "events")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Event {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @Column(nullable = false)
     private String title;
-
+    
     @Column(length = 2000)
     private String description;
-
+    
+    @Column(nullable = false)
     private String location;
-
-    private LocalDateTime date;
-
-    private int capacity;
-
+    
+    @Column(name = "event_date", nullable = false)
+    private LocalDateTime eventDate;
+    
+    private Integer capacity;
+    
     private String category;
-
+    
     @ManyToOne
-    @JoinColumn(name = "organizer_id")
+    @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
-
-    public Event() {}
-
-    // getters & setters
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getTitle() { return title; }
-
-    public void setTitle(String title) { this.title = title; }
-
-    public String getDescription() { return description; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public String getLocation() { return location; }
-
-    public void setLocation(String location) { this.location = location; }
-
-    public LocalDateTime getDate() { return date; }
-
-    public void setDate(LocalDateTime date) { this.date = date; }
-
-    public int getCapacity() { return capacity; }
-
-    public void setCapacity(int capacity) { this.capacity = capacity; }
-
-    public String getCategory() { return category; }
-
-    public void setCategory(String category) { this.category = category; }
-
-    public User getOrganizer() { return organizer; }
-
-    public void setOrganizer(User organizer) { this.organizer = organizer; }
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+    
+    // Vérifier si l'événement est complet
+    public boolean isFull() {
+        return capacity != null && comments.size() >= capacity;
+    }
+    
+    // Vérifier si l'événement est passé
+    public boolean isPast() {
+        return eventDate != null && eventDate.isBefore(LocalDateTime.now());
+    }
 }
