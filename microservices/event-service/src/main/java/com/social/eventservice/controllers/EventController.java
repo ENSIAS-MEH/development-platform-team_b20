@@ -1,0 +1,50 @@
+package com.social.eventservice.controllers;
+
+import com.social.eventservice.dto.CreateEventRequest;
+import com.social.eventservice.dto.EventResponseDTO;
+import com.social.eventservice.services.EventService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/events")
+@CrossOrigin(origins = "*")
+public class EventController {
+
+    @Autowired
+    private EventService eventService;
+
+    private Long getCurrentUserId() {
+        return 1L;
+    }
+
+    @PostMapping
+    public ResponseEntity<EventResponseDTO> createEvent(@Valid @RequestBody CreateEventRequest request) {
+        return new ResponseEntity<>(eventService.createEvent(request, getCurrentUserId()), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EventResponseDTO> updateEvent(@PathVariable Long id, @Valid @RequestBody CreateEventRequest request) {
+        return ResponseEntity.ok(eventService.updateEvent(id, request, getCurrentUserId()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id, getCurrentUserId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getEventById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
+        return ResponseEntity.ok(eventService.getAllEvents());
+    }
+}
