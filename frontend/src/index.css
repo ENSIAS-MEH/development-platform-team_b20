@@ -1,3 +1,61 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Design tokens — defined here in Tailwind v4 syntax */
+@theme {
+  /* Dark surfaces */
+  --color-dark-950: #0f172a;
+  --color-dark-900: #1e293b;
+
+  /* Brand orange */
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+
+  /* Animations */
+  --animate-fade-in: fadeIn 0.4s ease-out;
+}
+
+/* Custom keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom utility: glassmorphism effect */
+@utility glass-effect {
+  background-color: rgb(30 41 59 / 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(30 41 59);
+}
+
+/* Base styles — set the dark theme as default */
+html,
+body {
+  background-color: var(--color-dark-950);
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+}
+
+/* Scrollbar styling (optional but matches the dark look) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-dark-950);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-900);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

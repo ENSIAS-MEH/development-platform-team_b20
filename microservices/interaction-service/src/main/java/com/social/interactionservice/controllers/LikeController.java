@@ -9,7 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class LikeController {
 
     @Autowired

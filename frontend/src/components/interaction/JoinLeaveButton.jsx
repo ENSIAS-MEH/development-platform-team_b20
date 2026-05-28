@@ -1,0 +1,121 @@
+import { useEffect, useState } from "react";
+import { UserPlus, UserMinus, Users } from "lucide-react";
+import {
+  getParticipantIds,
+  joinEvent,
+  leaveEvent,
+  CURRENT_USER_ID,
+} from "../../services/interactionService";
+
+export default function JoinLeaveButton({ eventId }) {
+  const [joined, setJoined] = useState(false);
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    refresh();
+  }, [eventId]);
+
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const ids = await getParticipantIds(eventId);
+      setCount(ids.length);
+      setJoined(ids.includes(CURRENT_USER_ID));
+    } catch (err) {
+      console.error("Failed to load participants:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClick = async () => {
+    if (busy) return;
+
+    setBusy(true);
+    setError(null);
+
+    const newJoined = !joined;
+
+    // Optimistic update
+    setJoined(newJoined);
+    setCount((c) => c + (newJoined ? 1 : -1));
+
+    try {
+      if (newJoined) {
+        await joinEvent(eventId, CURRENT_USER_ID);
+      } else {
+        await leaveEvent(eventId, CURRENT_USER_ID);
+      }
+    } catch (err) {
+      // Revert on failure
+      setJoined(!newJoined);
+      setCount((c) => c + (newJoined ? -1 : 1));
+
+      const msg = err.response?.data?.error || err.message || "Something went wrong";
+      setError(msg);
+
+      // Auto-clear error after 4 seconds
+      setTimeout(() => setError(null), 4000);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-3">
+        <button
+          disabled
+          className="flex items-center gap-2 px-5 py-2.5 bg-dark-900 border border-slate-800 rounded-xl text-slate-500 cursor-wait"
+        >
+          <Users className="w-5 h-5" />
+          <span>Loading...</span>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={handleClick}
+          disabled={busy}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg ${
+            joined
+              ? "bg-dark-900 border border-slate-700 text-slate-300 hover:border-red-500 hover:text-red-500"
+              : "bg-primary-600 hover:bg-primary-500 text-white shadow-primary-600/20"
+          } ${busy ? "opacity-60 cursor-not-allowed" : ""}`}
+        >
+          {joined ? (
+            <>
+              <UserMinus className="w-5 h-5" />
+              <span>Leave</span>
+            </>
+          ) : (
+            <>
+              <UserPlus className="w-5 h-5" />
+              <span>Join</span>
+            </>
+          )}
+        </button>
+
+        <span className="flex items-center gap-1.5 text-slate-400 text-sm">
+          <Users className="w-4 h-4" />
+          <span>
+            <strong className="text-slate-200">{count}</strong> {count === 1 ? "person" : "people"} going
+          </span>
+        </span>
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 animate-fade-in">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
