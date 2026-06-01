@@ -1,48 +1,41 @@
 package com.social.eventservice.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "events", schema = "events_schema") 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "events")
 public class Event {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false)
+
     private String title;
-    
-    @Column(length = 2000)
     private String description;
-    
-    @Column(nullable = false)
     private String location;
-    
-    @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
-    
     private Integer capacity;
-    
     private String category;
-    
-    // MICROSERVICES : On stocke juste l'ID de l'organisateur (User)
-    // On ne met pas @ManyToOne car la classe User n'est pas dans ce projet
-    @Column(name = "organizer_id", nullable = false)
     private Long organizerId;
 
-    // Note : La liste des commentaires a été supprimée car elle sera gérée 
-    // par le microservice "interaction-service".
+    // Getters
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public String getLocation() { return location; }
+    public LocalDateTime getEventDate() { return eventDate; }
+    public Integer getCapacity() { return capacity; }
+    public String getCategory() { return category; }
+    public Long getOrganizerId() { return organizerId; }
 
-    // Vérifier si l'événement est passé
-    public boolean isPast() {
-        return eventDate != null && eventDate.isBefore(LocalDateTime.now());
-    }
+    // Setters
+    public void setId(Long id) { this.id = id; }
+    public void setTitle(String title) { this.title = title; }
+    public void setDescription(String description) { this.description = description; }
+    public void setLocation(String location) { this.location = location; }
+    public void setEventDate(LocalDateTime eventDate) { this.eventDate = eventDate; }
+    public void setCapacity(Integer capacity) { this.capacity = capacity; }
+    public void setCategory(String category) { this.category = category; }
+    public void setOrganizerId(Long organizerId) { this.organizerId = organizerId; }
 }
