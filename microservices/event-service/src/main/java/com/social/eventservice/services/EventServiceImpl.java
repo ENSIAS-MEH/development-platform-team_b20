@@ -3,11 +3,10 @@ package com.social.eventservice.services;
 import com.social.eventservice.dto.CreateEventRequest;
 import com.social.eventservice.dto.EventResponseDTO;
 import com.social.eventservice.entities.Event;
-import com.social.eventservice.proxies.UserDTO;
-import com.social.eventservice.proxies.UserProxy;
 import com.social.eventservice.repositories.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,13 +16,13 @@ public class EventServiceImpl implements EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    @Autowired
-    private UserProxy userProxy;
-
     @Override
     public EventResponseDTO createEvent(CreateEventRequest request, Long organizerId) {
-        UserDTO user = userProxy.getUserById(organizerId);
-        
+        // Vérifier que la date est dans le futur
+        if (request.getEventDate() != null && request.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La date de l'événement ne peut pas être dans le passé");
+        }
+
         Event event = new Event();
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
@@ -44,17 +43,24 @@ public class EventServiceImpl implements EventService {
         response.setCapacity(saved.getCapacity());
         response.setCategory(saved.getCategory());
         response.setOrganizerId(organizerId);
-        response.setOrganizerName(user != null ? user.getName() : "Inconnu");
+        response.setOrganizerName("Organisateur");
         
         return response;
     }
 
     @Override
     public EventResponseDTO updateEvent(Long id, CreateEventRequest request, Long userId) {
-        Event event = eventRepository.findById(id).orElseThrow();
+        Event event = eventRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
         
+        // Vérifier que l'utilisateur est l'organisateur
         if (!event.getOrganizerId().equals(userId)) {
-            throw new RuntimeException("Non autorisé");
+            throw new RuntimeException("Vous n'êtes pas autorisé à modifier cet événement");
+        }
+        
+        // Vérifier que l'événement n'est pas passé
+        if (event.getEventDate() != null && event.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Impossible de modifier un événement passé");
         }
         
         event.setTitle(request.getTitle());
@@ -75,23 +81,27 @@ public class EventServiceImpl implements EventService {
         response.setCapacity(updated.getCapacity());
         response.setCategory(updated.getCategory());
         response.setOrganizerId(updated.getOrganizerId());
+        response.setOrganizerName("Organisateur");
         
         return response;
     }
 
     @Override
     public void deleteEvent(Long id, Long userId) {
-        Event event = eventRepository.findById(id).orElseThrow();
+        Event event = eventRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
+        
         if (!event.getOrganizerId().equals(userId)) {
-            throw new RuntimeException("Non autorisé");
+            throw new RuntimeException("Vous n'êtes pas autorisé à supprimer cet événement");
         }
+        
         eventRepository.delete(event);
     }
 
     @Override
     public EventResponseDTO getEventById(Long id) {
-        Event event = eventRepository.findById(id).orElseThrow();
-        UserDTO user = userProxy.getUserById(event.getOrganizerId());
+        Event event = eventRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
         
         EventResponseDTO response = new EventResponseDTO();
         response.setId(event.getId());
@@ -102,7 +112,7 @@ public class EventServiceImpl implements EventService {
         response.setCapacity(event.getCapacity());
         response.setCategory(event.getCategory());
         response.setOrganizerId(event.getOrganizerId());
-        response.setOrganizerName(user != null ? user.getName() : "Inconnu");
+        response.setOrganizerName("Organisateur");
         
         return response;
     }
@@ -110,7 +120,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventResponseDTO> getAllEvents() {
         return eventRepository.findAll().stream().map(event -> {
-            UserDTO user = userProxy.getUserById(event.getOrganizerId());
             EventResponseDTO dto = new EventResponseDTO();
             dto.setId(event.getId());
             dto.setTitle(event.getTitle());
@@ -120,7 +129,7 @@ public class EventServiceImpl implements EventService {
             dto.setCapacity(event.getCapacity());
             dto.setCategory(event.getCategory());
             dto.setOrganizerId(event.getOrganizerId());
-            dto.setOrganizerName(user != null ? user.getName() : "Inconnu");
+            dto.setOrganizerName("Organisateur");
             return dto;
         }).collect(Collectors.toList());
     }

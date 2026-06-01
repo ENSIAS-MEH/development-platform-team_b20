@@ -6,7 +6,6 @@ public class UserDTO {
     private String email;
 
     public UserDTO() {}
-
     public UserDTO(Long id, String name, String email) {
         this.id = id;
         this.name = name;
