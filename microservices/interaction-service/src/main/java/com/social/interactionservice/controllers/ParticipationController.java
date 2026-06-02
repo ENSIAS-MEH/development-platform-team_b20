@@ -4,13 +4,14 @@ import com.social.interactionservice.services.ParticipationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/events")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173") 
+@RequestMapping("/api/events") 
 public class ParticipationController {
 
     @Autowired
