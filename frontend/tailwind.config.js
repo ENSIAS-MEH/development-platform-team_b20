@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -15,7 +15,8 @@ module.exports = {
           950: '#0f172a',
           900: '#1e293b',
           800: '#334155',
-        }
+        },
+        orangeAdmin: "#ea580c"
       },
     },
   },
