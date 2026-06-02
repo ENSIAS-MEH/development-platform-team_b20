@@ -9,6 +9,8 @@ public class CreateEventRequest {
     private LocalDateTime eventDate;
     private Integer capacity;
     private String category;
+    private String imageBase64;
+    private Boolean removeImage; // true = delete the existing image (for edits)
 
     // Getters
     public String getTitle() { return title; }
@@ -17,6 +19,8 @@ public class CreateEventRequest {
     public LocalDateTime getEventDate() { return eventDate; }
     public Integer getCapacity() { return capacity; }
     public String getCategory() { return category; }
+    public String getImageBase64() { return imageBase64; }
+    public Boolean getRemoveImage() { return removeImage; }
 
     // Setters
     public void setTitle(String title) { this.title = title; }
@@ -25,4 +29,6 @@ public class CreateEventRequest {
     public void setEventDate(LocalDateTime eventDate) { this.eventDate = eventDate; }
     public void setCapacity(Integer capacity) { this.capacity = capacity; }
     public void setCategory(String category) { this.category = category; }
+    public void setImageBase64(String imageBase64) { this.imageBase64 = imageBase64; }
+    public void setRemoveImage(Boolean removeImage) { this.removeImage = removeImage; }
 }

@@ -17,6 +17,9 @@ public class Event {
     private LocalDateTime eventDate;
     private Integer capacity;
     private String category;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String imageBase64;
     private Long organizerId;
 
     // Getters
@@ -28,6 +31,7 @@ public class Event {
     public Integer getCapacity() { return capacity; }
     public String getCategory() { return category; }
     public Long getOrganizerId() { return organizerId; }
+    public String getImageBase64() { return imageBase64; }
 
     // Setters
     public void setId(Long id) { this.id = id; }
@@ -38,4 +42,5 @@ public class Event {
     public void setCapacity(Integer capacity) { this.capacity = capacity; }
     public void setCategory(String category) { this.category = category; }
     public void setOrganizerId(Long organizerId) { this.organizerId = organizerId; }
+    public void setImageBase64(String imageBase64) { this.imageBase64 = imageBase64; }
 }
