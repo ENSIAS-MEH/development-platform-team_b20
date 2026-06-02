@@ -29,10 +29,24 @@ const EventList = ({ events, onEventDeleted, onEdit, currentUserId = 1 }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {events.map(event => (
         <div key={event.id} className="glass-effect rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-primary-600/20 transition-all duration-300 hover:-translate-y-1">
-          <div className="h-28 bg-gradient-to-r from-primary-800 to-primary-600 flex items-center justify-between p-4">
-            <span className="px-3 py-1 bg-dark-950/80 backdrop-blur rounded-full text-xs font-semibold text-primary-400">
-              {event.category}
-            </span>
+          <div className="relative h-28 overflow-hidden">
+            {event.imageBase64 ? (
+              <>
+                <img
+                  src={`data:image/jpeg;base64,${event.imageBase64}`}
+                  alt={event.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-dark-950/20 to-transparent" />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500" />
+            )}
+            <div className="relative h-full flex items-center justify-between p-4">
+              <span className="px-3 py-1 bg-dark-950/80 backdrop-blur rounded-full text-xs font-semibold text-primary-500">
+                {event.category}
+              </span>
+            </div>
           </div>
           
           <div className="p-5">

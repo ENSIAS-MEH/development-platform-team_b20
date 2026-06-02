@@ -10,6 +10,7 @@ public class EventResponseDTO {
     private LocalDateTime eventDate;
     private Integer capacity;
     private String category;
+    private String imageBase64;
     private Long organizerId;
     private String organizerName;
 
@@ -21,6 +22,7 @@ public class EventResponseDTO {
     public LocalDateTime getEventDate() { return eventDate; }
     public Integer getCapacity() { return capacity; }
     public String getCategory() { return category; }
+    public String getImageBase64() { return imageBase64; }
     public Long getOrganizerId() { return organizerId; }
     public String getOrganizerName() { return organizerName; }
 
@@ -32,6 +34,7 @@ public class EventResponseDTO {
     public void setEventDate(LocalDateTime eventDate) { this.eventDate = eventDate; }
     public void setCapacity(Integer capacity) { this.capacity = capacity; }
     public void setCategory(String category) { this.category = category; }
+    public void setImageBase64(String imageBase64) { this.imageBase64 = imageBase64; }
     public void setOrganizerId(Long organizerId) { this.organizerId = organizerId; }
     public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
 }

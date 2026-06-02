@@ -75,10 +75,27 @@ const EventDetailPage = () => {
         </button>
         
         <div className="glass-effect rounded-3xl overflow-hidden">
-          <div className="relative h-48 bg-gradient-to-r from-primary-800 to-primary-600 flex items-center justify-between p-6">
-            <span className="px-4 py-2 bg-dark-950/80 backdrop-blur rounded-full text-sm font-semibold text-primary-400">
-              {event.category}
-            </span>
+          <div className="relative h-48 overflow-hidden">
+            {event.imageBase64 ? (
+              <>
+                <img
+                  src={`data:image/jpeg;base64,${event.imageBase64}`}
+                  alt={event.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Dark gradient overlay so the badge stays readable */}
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-dark-950/20 to-transparent" />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-500" />
+            )}
+
+            {/* Category badge — overlaid on top of either image or gradient */}
+            <div className="relative h-full flex items-center justify-between p-6">
+              <span className="px-4 py-2 bg-dark-950/80 backdrop-blur rounded-full text-sm font-semibold text-primary-500">
+                {event.category}
+              </span>
+            </div>
           </div>
           
           <div className="p-8">

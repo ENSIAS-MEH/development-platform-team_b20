@@ -18,7 +18,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponseDTO createEvent(CreateEventRequest request, Long organizerId) {
-        // Vérifier que la date est dans le futur
         if (request.getEventDate() != null && request.getEventDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("La date de l'événement ne peut pas être dans le passé");
         }
@@ -30,71 +29,58 @@ public class EventServiceImpl implements EventService {
         event.setEventDate(request.getEventDate());
         event.setCapacity(request.getCapacity());
         event.setCategory(request.getCategory());
+        event.setImageBase64(request.getImageBase64());
         event.setOrganizerId(organizerId);
-        
+
         Event saved = eventRepository.save(event);
-        
-        EventResponseDTO response = new EventResponseDTO();
-        response.setId(saved.getId());
-        response.setTitle(saved.getTitle());
-        response.setDescription(saved.getDescription());
-        response.setLocation(saved.getLocation());
-        response.setEventDate(saved.getEventDate());
-        response.setCapacity(saved.getCapacity());
-        response.setCategory(saved.getCategory());
-        response.setOrganizerId(organizerId);
-        response.setOrganizerName("Organisateur");
-        
-        return response;
+
+        return toDTO(saved);
     }
 
     @Override
     public EventResponseDTO updateEvent(Long id, CreateEventRequest request, Long userId) {
         Event event = eventRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
-        
-        // Vérifier que l'utilisateur est l'organisateur
+
         if (!event.getOrganizerId().equals(userId)) {
             throw new RuntimeException("Vous n'êtes pas autorisé à modifier cet événement");
         }
-        
-        // Vérifier que l'événement n'est pas passé
+
         if (event.getEventDate() != null && event.getEventDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Impossible de modifier un événement passé");
         }
-        
+
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setLocation(request.getLocation());
         event.setEventDate(request.getEventDate());
         event.setCapacity(request.getCapacity());
         event.setCategory(request.getCategory());
-        
+
+        // Image logic:
+        // - removeImage = true  → delete the existing image
+        // - new imageBase64 present → replace
+        // - imageBase64 empty/null and no removeImage flag → keep existing
+        if (Boolean.TRUE.equals(request.getRemoveImage())) {
+            event.setImageBase64(null);
+        } else if (request.getImageBase64() != null && !request.getImageBase64().isEmpty()) {
+            event.setImageBase64(request.getImageBase64());
+        }
+
         Event updated = eventRepository.save(event);
-        
-        EventResponseDTO response = new EventResponseDTO();
-        response.setId(updated.getId());
-        response.setTitle(updated.getTitle());
-        response.setDescription(updated.getDescription());
-        response.setLocation(updated.getLocation());
-        response.setEventDate(updated.getEventDate());
-        response.setCapacity(updated.getCapacity());
-        response.setCategory(updated.getCategory());
-        response.setOrganizerId(updated.getOrganizerId());
-        response.setOrganizerName("Organisateur");
-        
-        return response;
+
+        return toDTO(updated);
     }
 
     @Override
     public void deleteEvent(Long id, Long userId) {
         Event event = eventRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
-        
+
         if (!event.getOrganizerId().equals(userId)) {
             throw new RuntimeException("Vous n'êtes pas autorisé à supprimer cet événement");
         }
-        
+
         eventRepository.delete(event);
     }
 
@@ -102,35 +88,29 @@ public class EventServiceImpl implements EventService {
     public EventResponseDTO getEventById(Long id) {
         Event event = eventRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
-        
-        EventResponseDTO response = new EventResponseDTO();
-        response.setId(event.getId());
-        response.setTitle(event.getTitle());
-        response.setDescription(event.getDescription());
-        response.setLocation(event.getLocation());
-        response.setEventDate(event.getEventDate());
-        response.setCapacity(event.getCapacity());
-        response.setCategory(event.getCategory());
-        response.setOrganizerId(event.getOrganizerId());
-        response.setOrganizerName("Organisateur");
-        
-        return response;
+        return toDTO(event);
     }
 
     @Override
     public List<EventResponseDTO> getAllEvents() {
-        return eventRepository.findAll().stream().map(event -> {
-            EventResponseDTO dto = new EventResponseDTO();
-            dto.setId(event.getId());
-            dto.setTitle(event.getTitle());
-            dto.setDescription(event.getDescription());
-            dto.setLocation(event.getLocation());
-            dto.setEventDate(event.getEventDate());
-            dto.setCapacity(event.getCapacity());
-            dto.setCategory(event.getCategory());
-            dto.setOrganizerId(event.getOrganizerId());
-            dto.setOrganizerName("Organisateur");
-            return dto;
-        }).collect(Collectors.toList());
+        return eventRepository.findAll().stream()
+            .map(this::toDTO)
+            .collect(Collectors.toList());
+    }
+
+    // Helper: Event entity → DTO (extracted to one place for consistency)
+    private EventResponseDTO toDTO(Event event) {
+        EventResponseDTO dto = new EventResponseDTO();
+        dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
+        dto.setDescription(event.getDescription());
+        dto.setLocation(event.getLocation());
+        dto.setEventDate(event.getEventDate());
+        dto.setCapacity(event.getCapacity());
+        dto.setCategory(event.getCategory());
+        dto.setImageBase64(event.getImageBase64());
+        dto.setOrganizerId(event.getOrganizerId());
+        dto.setOrganizerName("Organisateur");
+        return dto;
     }
 }
