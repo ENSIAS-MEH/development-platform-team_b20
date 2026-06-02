@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, User, ArrowLeft, Edit2 } from 'lucide-react';
 import { eventApi } from '../services/api';
+import LikeButton from '../components/interaction/LikeButton';
+import JoinLeaveButton from '../components/interaction/JoinLeaveButton';
+import CommentSection from '../components/interaction/CommentSection';
 
 const EventDetailPage = () => {
   const { id } = useParams();
@@ -117,6 +120,17 @@ const EventDetailPage = () => {
                 <p className="text-slate-400 leading-relaxed">{event.description}</p>
               </div>
             )}
+
+            {/* Interaction bar (Personne 3) */}
+            <div className="flex flex-wrap items-center justify-between gap-4 py-6 border-t border-slate-800">
+              <JoinLeaveButton eventId={id} />
+              <LikeButton eventId={id} />
+            </div>
+
+            {/* Comments (Personne 3) */}
+            <div className="py-6 border-t border-slate-800">
+              <CommentSection eventId={id} />
+            </div>
             
             <div className="pt-6 border-t border-slate-800">
               <button
