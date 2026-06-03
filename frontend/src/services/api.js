@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8082/api';
+const API_URL = 'http://localhost:8080/event-service/api';
 
 export const eventApi = {
   // Récupérer tous les événements
