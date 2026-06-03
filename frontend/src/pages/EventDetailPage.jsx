@@ -6,6 +6,8 @@ import LikeButton from '../components/interaction/LikeButton';
 import JoinLeaveButton from '../components/interaction/JoinLeaveButton';
 import CommentSection from '../components/interaction/CommentSection';
 
+const CURRENT_USER_ID = 1; // TODO: replace with logged-in user once Issam's JWT auth is wired
+
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -149,15 +151,17 @@ const EventDetailPage = () => {
               <CommentSection eventId={id} />
             </div>
             
-            <div className="pt-6 border-t border-slate-800">
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 rounded-xl text-white font-semibold transition-all"
-              >
-                <Edit2 className="w-4 h-4" />
-                Modifier cet événement
-              </button>
-            </div>
+            {event.organizerId === CURRENT_USER_ID && (
+              <div className="pt-6 border-t border-slate-800">
+                <button
+                  onClick={handleEdit}
+                  className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 rounded-xl text-white font-semibold transition-all"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Modifier cet événement
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
