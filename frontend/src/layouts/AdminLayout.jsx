@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, Calendar, BarChart3, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users,User, Calendar, BarChart3, LogOut,MessageSquare} from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const AdminLayout = ({ children }) => {
@@ -10,6 +10,8 @@ const AdminLayout = ({ children }) => {
     { path: '/admin/users', icon: <Users size={20} />, label: 'Utilisateurs' },
     { path: '/admin/events', icon: <Calendar size={20} />, label: 'Événements' },
     { path: '/admin/stats', icon: <BarChart3 size={20} />, label: 'Statistiques' },
+    { path: '/admin/moderation', icon: <MessageSquare size={20} />, label: 'Modération' },
+    { path: '/admin/profile', icon: <User size={20} />, label: 'Mon Profil' }
   ];
 
   return (

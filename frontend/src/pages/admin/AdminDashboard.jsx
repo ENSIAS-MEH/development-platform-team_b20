@@ -3,27 +3,10 @@ import AdminLayout from '../../layouts/AdminLayout';
 import StatCard from '../../components/admin/StatCard';
 import { adminApi } from '../../services/api'; // Import de ton service API
 import { Users, Calendar, MessageSquare, Activity, ArrowUpRight } from 'lucide-react';
+import { useStats } from '../../context/StatsContext';
 
 const AdminDashboard = () => {
-  // 1. État pour stocker les vraies statistiques
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // 2. Appel au Backend au chargement de la page
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await adminApi.getStats();
-        setStats(data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
+  const { stats, loading } = useStats();
   // Affichage pendant le chargement
   if (loading) {
     return (
