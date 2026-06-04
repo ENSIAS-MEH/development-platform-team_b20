@@ -58,7 +58,7 @@ public class DashboardService {
                 }
 
                 // Commentaires
-                List<Object> commsRes = interactionClient.getEventComments(event.getId());
+                List<CommentSummaryDTO> commsRes = interactionClient.getEventComments(event.getId());
                 if (commsRes != null) {
                     c = commsRes.size();
                 }
@@ -99,7 +99,8 @@ public class DashboardService {
             Math.round(participationRate * 10.0) / 10.0, 
             calculateCategories(allEvents), // Utilise la fonction définie plus bas
             eventsByCity,
-            finalTop
+            finalTop,
+            allEvents
         );
     }
 
@@ -114,4 +115,32 @@ public class DashboardService {
                 Collectors.counting()
             ));
     }
+
+public List<CommentSummaryDTO> getAllCommentsForModeration() {
+    List<CommentSummaryDTO> allComments = new ArrayList<>();
+    
+    try {
+        List<EventSummaryDTO> events = eventClient.getAllEvents();
+        if (events != null) {
+            for (EventSummaryDTO event : events) {
+                try {
+                    // Maintenant que le client est mis à jour, plus d'erreur ici !
+                    List<CommentSummaryDTO> comments = interactionClient.getEventComments(event.getId());
+                    if (comments != null) {
+                        allComments.addAll(comments);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erreur comms pour event " + event.getId());
+                }
+            }
+        }
+    } catch (Exception e) {
+        System.err.println("Erreur globale récupération commentaires");
+    }
+    
+    return allComments;
+}
+public void hideCommentViaInteractionService(Long id) {
+    interactionClient.hideComment(id);
+}
 }

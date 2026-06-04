@@ -116,3 +116,30 @@ export const interactionApi = {
     return res.json(); 
   }
 };
+
+export const recommendationApi = {
+  getRecommendations: async (userId) => {
+    // ON REPASSE PAR LA GATEWAY (8080)
+    const res = await fetch(`http://localhost:8080/recommendation-service/api/recommendations/user/${userId}`);
+    if (!res.ok) return [];
+    return res.json();
+  }
+};
+
+export const userApi = {
+  // Récupérer mes infos (Hatim)
+  getMe: async (userId) => {
+    const res = await fetch(`${GATEWAY_URL}/user-service/api/users/${userId}`);
+    if (!res.ok) throw new Error('Erreur profil');
+    return res.json();
+  },
+  // Mettre à jour mes infos
+  updateMe: async (userId, data) => {
+    const res = await fetch(`${GATEWAY_URL}/user-service/api/users/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  }
+};

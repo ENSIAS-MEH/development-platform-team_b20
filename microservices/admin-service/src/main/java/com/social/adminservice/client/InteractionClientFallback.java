@@ -1,6 +1,9 @@
 package com.social.adminservice.client;
 
 import org.springframework.stereotype.Component;
+
+import com.social.adminservice.dto.CommentSummaryDTO;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +21,11 @@ public class InteractionClientFallback implements InteractionClient {
     }
 
     @Override
-    public List<Object> getEventComments(Long id) {
-        return Collections.emptyList();
+    public List<CommentSummaryDTO> getEventComments(Long id) {
+        return java.util.Collections.emptyList();
+}
+    @Override
+    public void hideComment(Long commentId) {
+        System.out.println("Panic: interaction-service est down, impossible de masquer.");
     }
 }
