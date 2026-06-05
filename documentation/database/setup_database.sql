@@ -16,13 +16,28 @@ CREATE TABLE IF NOT EXISTS users_schema.users (
     email VARCHAR(255) UNIQUE NOT NULL,
     full_name VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'USER'
+    bio TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users_schema.roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users_schema.user_roles (
+    user_id BIGINT NOT NULL,
+    role_id INT NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users_schema.users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES users_schema.roles(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS users_schema.user_interests (
     user_id BIGINT NOT NULL,
-    interests VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users_schema.users(id)
+    interest VARCHAR(100) NOT NULL,
+    PRIMARY KEY (user_id, interest),
+    FOREIGN KEY (user_id) REFERENCES users_schema.users(id) ON DELETE CASCADE
 );
 
 -- ==========================================================
@@ -69,13 +84,30 @@ CREATE TABLE IF NOT EXISTS interactions_schema.participations (
 -- 5. DONNÉES DE TEST (SEED DATA) 
 -- ==========================================================
 
+-- Insertion des rôles
+INSERT INTO users_schema.roles (name) VALUES 
+('ROLE_USER'),
+('ROLE_ADMIN');
 
-INSERT INTO users_schema.users (email, full_name, password, role) 
+-- Insertion des utilisateurs (Les mots de passe ici simulent un hash BCrypt)
+INSERT INTO users_schema.users (email, full_name, password, bio) 
 VALUES 
-('admin@social.com', 'Admin Hatim', 'password123', 'ADMIN'),
-('nizar@social.com', 'Nizar Events', 'password123', 'USER');
+('admin@social.com', 'Admin User', '1234', 'Administrateur principal du système.'),
+('nizar@social.com', 'Nizar Ben Ayad', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HCGa3KP5wEysRl9zG1Vuq', 'Passionné par l''organisation d''événements tech.');
 
+-- Attribution des rôles
+INSERT INTO users_schema.user_roles (user_id, role_id) 
+VALUES 
+(1, 2), -- admin@social.com devient ROLE_ADMIN
+(2, 1); -- nizar@social.com devient ROLE_USER
 
+-- Insertion des centres d'intérêt
+INSERT INTO users_schema.user_interests (user_id, interest)
+VALUES
+(2, 'Développement Web'),
+(2, 'Intelligence Artificielle');
+
+-- Insertion d'un événement
 INSERT INTO events_schema.events (title, description, location, event_date, capacity, category, organizer_id)
 VALUES 
-('Workshop Spring Boot', 'Apprendre les microservices', 'ENSIAS Rabat', '2026-06-01 10:00:00', 50, 'Education', 1);
+('Workshop Spring Boot', 'Apprendre les microservices', 'ENSIAS Rabat', '2026-06-01 10:00:00', 50, 'Education', 2);
