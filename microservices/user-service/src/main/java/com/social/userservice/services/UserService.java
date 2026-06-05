@@ -6,10 +6,8 @@ import com.social.userservice.dto.UserResponseDto;
 import com.social.userservice.entities.User;
 import com.social.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 @Service
@@ -17,23 +15,20 @@ import java.util.HashSet;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // Ajouté pour hacher le mot de passe à l'inscription
 
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
             throw new RuntimeException("Cet email est déjà utilisé");
         }
 
+        // On initialise avec des HashSet pour garantir la compatibilité Set<String>
         User newUser = User.builder()
                 .email(registrationDto.getEmail())
-                .password(passwordEncoder.encode(registrationDto.getPassword())) // Sécurisation du mot de passe
+                .password(registrationDto.getPassword()) 
                 .fullName(registrationDto.getFullName())
                 .roles(new HashSet<>()) 
                 .interests(new HashSet<>())
                 .build();
-
-        // Par défaut, on peut donner le rôle USER
-        newUser.getRoles().add("USER");
 
         User savedUser = userRepository.save(newUser);
 
@@ -66,8 +61,8 @@ public class UserService {
                 .fullName(user.getFullName())
                 .bio(user.getBio())
                 .createdAt(user.getCreatedAt())
-                // On passe les rôles directement (en convertissant en List si ton DTO l'exige)
-                .roles(user.getRoles() != null ? new ArrayList<>(user.getRoles()) : new ArrayList<>())
+                // On utilise HashSet pour éviter toute erreur de type
+                .roles(user.getRoles() != null ? user.getRoles() : new HashSet<>())
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../services/authApi';
+import { authApi } from '../services/authApi';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
@@ -16,18 +16,18 @@ const RegisterPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      await register(formData);
+      // ✅ Appel correct à l'API exportée
+      await authApi.register(formData);
       setIsSuccess(true);
       setMessage("Inscription réussie ! Redirection en cours...");
       
-      // Redirection automatique vers le profil après 2 secondes
       setTimeout(() => {
         navigate('/profile'); 
       }, 2000);
       
     } catch (error) {
       setIsSuccess(false);
-      setMessage(error.response?.data?.message || "Erreur lors de l'inscription.");
+      setMessage(error.message || "Erreur lors de l'inscription.");
     }
   };
 
