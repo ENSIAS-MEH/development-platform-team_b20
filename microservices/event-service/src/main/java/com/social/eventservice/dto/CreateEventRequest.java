@@ -3,6 +3,8 @@ package com.social.eventservice.dto;
 import java.time.LocalDateTime;
 
 public class CreateEventRequest {
+    private Long organizerId;
+    private String organizerName;
     private String title;
     private String description;
     private String location;
@@ -21,6 +23,8 @@ public class CreateEventRequest {
     public String getCategory() { return category; }
     public String getImageBase64() { return imageBase64; }
     public Boolean getRemoveImage() { return removeImage; }
+    public Long getOrganizerId() { return organizerId; }
+    public String getOrganizerName() { return organizerName; }
 
     // Setters
     public void setTitle(String title) { this.title = title; }
@@ -31,4 +35,6 @@ public class CreateEventRequest {
     public void setCategory(String category) { this.category = category; }
     public void setImageBase64(String imageBase64) { this.imageBase64 = imageBase64; }
     public void setRemoveImage(Boolean removeImage) { this.removeImage = removeImage; }
+    public void setOrganizerId(Long organizerId) { this.organizerId = organizerId; }
+    public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
 }

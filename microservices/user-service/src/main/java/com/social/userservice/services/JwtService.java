@@ -1,75 +1,80 @@
 package com.social.userservice.services;
 
+import com.social.userservice.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    // Clé secrète pour signer le token (À mettre idéalement dans application.properties en production)
-    // C'est une clé générée en Base64 (256-bit)
-    private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
 
-    // Générer un token pour un utilisateur
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    @Value("${app.jwt.expiration-ms}")
+    private long jwtExpirationMs;
+
+    private SecretKey getSigningKey() {
+        // The secret must be 32+ chars when using HS256
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Générer un token avec des informations supplémentaires (claims)
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    /**
+     * Generate a JWT for a user. The token carries:
+     *  - subject: user id
+     *  - claim "email"
+     *  - claim "role"
+     */
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+        claims.put("fullName", user.getFullName());
+
         return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) // On met l'email dans le token
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Expire dans 24 heures
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+            .claims(claims)
+            .subject(String.valueOf(user.getId()))
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+            .signWith(getSigningKey(), Jwts.SIG.HS256)
+            .compact();
     }
 
-    // --- Méthodes utilitaires pour lire et valider le token plus tard ---
-
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    /**
+     * Parse and validate a token. Throws if invalid or expired.
+     */
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    public Long extractUserId(String token) {
+        return Long.valueOf(parseToken(token).getSubject());
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public String extractRole(String token) {
+        return parseToken(token).get("role", String.class);
     }
 
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public boolean isTokenValid(String token) {
+        try {
+            parseToken(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

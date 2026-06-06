@@ -1,70 +1,104 @@
-// src/pages/LoginPage.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Mail, Lock, LogIn } from 'lucide-react';
+import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Tentative de connexion avec:', email);
-    // TODO: Connecter avec ton authApi.js plus tard
-    // navigate('/dashboard'); 
+    if (!formData.email || !formData.password) {
+      setError('Email et mot de passe requis');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const response = await authService.login(formData);
+      login(response);
+      // If user was sent here from a protected page, send them back there.
+      // Otherwise, redirect by role.
+      const from = location.state?.from?.pathname;
+      const defaultDestination = response.role === 'ADMIN' ? '/admin' : '/events';
+      navigate(from || defaultDestination, { replace: true });
+      
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-md border border-gray-200">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Connexion</h2>
-        
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input 
-              type="email" 
-              name="email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="glass-effect rounded-3xl p-8 animate-fade-in">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-2xl mb-4">
+              <LogIn className="w-8 h-8 text-primary-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-200">Connexion</h1>
+            <p className="text-slate-400 mt-2">Bienvenue ! Connectez-vous pour continuer.</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
-            <input 
-              type="password" 
-              name="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="flex justify-end mt-2">
-            <button 
-              type="button"
-              className="text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none"
-              onClick={() => alert("Fonctionnalité 'Mot de passe oublié' à venir !")}
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-center text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-slate-300 font-semibold mb-2">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="alice@example.com"
+                  className="w-full pl-12 pr-4 py-3 bg-dark-900 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-primary-600 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 font-semibold mb-2">Mot de passe</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-4 py-3 bg-dark-900 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-primary-600 transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 rounded-xl text-white font-semibold transition-all shadow-lg shadow-primary-600/20"
             >
-              Mot de passe oublié ?
+              {loading ? 'Connexion...' : 'Se connecter'}
             </button>
-          </div>
+          </form>
 
-          <button 
-            type="submit" 
-            className="w-full py-2 px-4 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mt-4"
-          >
-            Se connecter
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Nouveau sur notre plateforme ?{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+          <p className="text-center text-slate-400 text-sm mt-6">
+            Pas encore de compte ?{' '}
+            <Link to="/register" className="text-primary-500 hover:text-primary-400 font-semibold">
               S'inscrire
             </Link>
           </p>

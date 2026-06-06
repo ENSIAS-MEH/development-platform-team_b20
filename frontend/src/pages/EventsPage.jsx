@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, LogOut, LogIn } from 'lucide-react';
 import EventList from '../components/events/EventList';
 import EventSearchBar from '../components/events/EventSearchBar';
 import { eventApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const EventsPage = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [allEvents, setAllEvents] = useState([]);
@@ -72,13 +74,40 @@ const EventsPage = () => {
               </h1>
               <p className="text-slate-400 text-sm mt-1">Découvrez et participez aux événements</p>
             </div>
-            <button
-              onClick={() => navigate('/events/create')}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-500 rounded-xl text-white font-semibold transition-all shadow-lg shadow-primary-600/20"
-            >
-              <Plus className="w-5 h-5" />
-              Créer un événement
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/events/create')}
+                className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-500 rounded-xl text-white font-semibold transition-all shadow-lg shadow-primary-600/20"
+              >
+                <Plus className="w-5 h-5" />
+                Créer un événement
+              </button>
+              {isAuthenticated ? (
+                <>
+                  <span className="text-slate-300 text-sm hidden md:inline">
+                    Bonjour, <strong>{user.fullName || user.email}</strong>
+                  </span>
+                  <button
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-dark-900 border border-slate-800 hover:border-red-500 hover:text-red-500 rounded-xl text-slate-300 font-semibold transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden md:inline">Déconnexion</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => navigate('/login')}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-dark-900 border border-slate-800 hover:border-primary-600 hover:text-primary-500 rounded-xl text-slate-300 font-semibold transition-all"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Connexion
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -89,7 +118,7 @@ const EventsPage = () => {
           events={events}
           onEventDeleted={handleRefresh}
           onEdit={handleEdit}
-          currentUserId={1}
+          currentUserId={user?.userId}
         />
       </main>
     </div>

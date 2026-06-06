@@ -1,46 +1,39 @@
 package com.social.userservice.controllers;
 
-import com.social.userservice.dto.AuthResponseDto;
-import com.social.userservice.dto.UserLoginDto;
-import com.social.userservice.dto.UserRegistrationDto;
-import com.social.userservice.dto.UserResponseDto;
-import com.social.userservice.repositories.UserRepository;
-import com.social.userservice.services.JwtService;
-import com.social.userservice.services.UserService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.social.userservice.dto.AuthResponse;
+import com.social.userservice.dto.LoginRequest;
+import com.social.userservice.dto.RegisterRequest;
+import com.social.userservice.services.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173", maxAge = 3600) // Double sécurité anti-CORS
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final UserRepository userRepository;
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
-        UserResponseDto createdUser = userService.registerUser(registrationDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            AuthResponse response = authService.register(request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginDto loginDto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-        );
-
-        var user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-
-        return ResponseEntity.ok(AuthResponseDto.builder().token(jwtToken).build());
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
     }
 }

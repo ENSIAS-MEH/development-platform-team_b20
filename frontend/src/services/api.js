@@ -1,3 +1,4 @@
+const GATEWAY_URL = 'http://localhost:8080';
 const API_URL = 'http://localhost:8080/event-service/api';
 
 export const eventApi = {
@@ -87,5 +88,58 @@ export const eventApi = {
     }
     
     return filteredEvents;
+  }
+  };
+  //fin code nizar
+// --- 2. TA PARTIE ADMIN (AJOUTÉE EN DESSOUS) ---
+const ADMIN_API_URL = `${GATEWAY_URL}/admin-service/api`;
+
+export const adminApi = {
+  getStats: async () => {
+    const res = await fetch(`${ADMIN_API_URL}/admin/dashboard/stats`);
+    if (!res.ok) throw new Error('Erreur lors de la récupération des stats');
+    return res.json();
+  },
+  // Nouvelle route pour la liste des membres
+  getAllUsers: async () => {
+    const res = await fetch(`${GATEWAY_URL}/user-service/api/users`);
+    if (!res.ok) return [];
+    return res.json();
+  }
+};
+
+// --- 3. TA PARTIE INTERACTION (AJOUTÉE EN DESSOUS) ---
+export const interactionApi = {
+  getParticipants: async (eventId) => {
+    const res = await fetch(`${GATEWAY_URL}/interaction-service/api/events/${eventId}/participants`);
+    if (!res.ok) return [];
+    return res.json(); 
+  }
+};
+
+export const recommendationApi = {
+  getRecommendations: async (userId) => {
+    // ON REPASSE PAR LA GATEWAY (8080)
+    const res = await fetch(`http://localhost:8080/recommendation-service/api/recommendations/user/${userId}`);
+    if (!res.ok) return [];
+    return res.json();
+  }
+};
+
+export const userApi = {
+  // Récupérer mes infos (Hatim)
+  getMe: async (userId) => {
+    const res = await fetch(`${GATEWAY_URL}/user-service/api/users/${userId}`);
+    if (!res.ok) throw new Error('Erreur profil');
+    return res.json();
+  },
+  // Mettre à jour mes infos
+  updateMe: async (userId, data) => {
+    const res = await fetch(`${GATEWAY_URL}/user-service/api/users/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
   }
 };

@@ -13,6 +13,10 @@ const qs = (params) => {
   return '?' + filtered.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
 };
 
+// Export de l'ID utilisateur courant via variable d'environnement
+export const CURRENT_USER_ID = import.meta.env.VITE_CURRENT_USER_ID || "temp-user-123";
+
+// Une seule déclaration de interactionApi
 export const interactionApi = {
 
   // ----- PARTICIPATION -----
@@ -114,6 +118,3 @@ export const interactionApi = {
     return res.json();
   },
 };
-
-// Temporary: hardcoded user ID until Issam's JWT auth is wired up
-export const CURRENT_USER_ID = 1;

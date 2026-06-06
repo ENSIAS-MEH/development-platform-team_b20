@@ -31,6 +31,7 @@ public class EventServiceImpl implements EventService {
         event.setCategory(request.getCategory());
         event.setImageBase64(request.getImageBase64());
         event.setOrganizerId(organizerId);
+        event.setOrganizerName(request.getOrganizerName());
 
         Event saved = eventRepository.save(event);
 
@@ -110,7 +111,7 @@ public class EventServiceImpl implements EventService {
         dto.setCategory(event.getCategory());
         dto.setImageBase64(event.getImageBase64());
         dto.setOrganizerId(event.getOrganizerId());
-        dto.setOrganizerName("Organisateur");
+        dto.setOrganizerName(event.getOrganizerName() != null ? event.getOrganizerName() : "Organisateur");
         return dto;
     }
 }
