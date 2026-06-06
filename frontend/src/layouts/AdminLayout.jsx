@@ -1,9 +1,12 @@
 import React from 'react';
-import { LayoutDashboard, Users,User, Calendar, BarChart3, LogOut,MessageSquare} from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Users, User, Calendar, BarChart3, LogOut, MessageSquare } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const menuItems = [
     { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Vue d\'ensemble' },
@@ -43,10 +46,16 @@ const AdminLayout = ({ children }) => {
         </nav>
 
         <div className="p-6 border-t border-slate-800">
-          <Link to="/" className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all font-bold text-sm">
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all font-bold text-sm w-full"
+          >
             <LogOut size={20} />
-            <span>Quitter Admin</span>
-          </Link>
+            <span>Déconnexion</span>
+          </button>
         </div>
       </aside>
 

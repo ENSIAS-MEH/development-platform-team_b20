@@ -23,12 +23,17 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponseDTO> createEvent(@Valid @RequestBody CreateEventRequest request) {
-        return new ResponseEntity<>(eventService.createEvent(request, getCurrentUserId()), HttpStatus.CREATED);
+        // Trust the frontend to send the organizer ID (MVP — no JWT validation here yet).
+        // If not provided, fall back to the placeholder.
+        Long organizerId = request.getOrganizerId() != null ? request.getOrganizerId() : getCurrentUserId();
+        return new ResponseEntity<>(eventService.createEvent(request, organizerId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EventResponseDTO> updateEvent(@PathVariable Long id, @Valid @RequestBody CreateEventRequest request) {
-        return ResponseEntity.ok(eventService.updateEvent(id, request, getCurrentUserId()));
+        // MVP: frontend sends the acting user's ID; backend uses it for ownership check
+        Long userId = request.getOrganizerId() != null ? request.getOrganizerId() : getCurrentUserId();
+        return ResponseEntity.ok(eventService.updateEvent(id, request, userId));
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, Send, Trash2, User } from 'lucide-react';
-import { interactionApi, CURRENT_USER_ID } from '../../services/interactionService';
+import { interactionApi } from '../../services/interactionService';
+import { useAuth } from '../../context/AuthContext';
 
 const CommentSection = ({ eventId }) => {
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?.userId;
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
@@ -26,12 +29,13 @@ const CommentSection = ({ eventId }) => {
   };
 
   const handlePost = async () => {
+    if (!isAuthenticated) return;
     const content = draft.trim();
     if (!content || posting) return;
     setPosting(true);
     setError(null);
     try {
-      const newComment = await interactionApi.addComment(eventId, CURRENT_USER_ID, content);
+      const newComment = await interactionApi.addComment(eventId, userId, content);
       setComments(prev => [newComment, ...prev]);
       setDraft('');
     } catch (err) {
@@ -46,7 +50,7 @@ const CommentSection = ({ eventId }) => {
     const previous = comments;
     setComments(prev => prev.filter(c => c.id !== commentId));
     try {
-      await interactionApi.deleteComment(commentId, CURRENT_USER_ID);
+      await interactionApi.deleteComment(commentId, userId);
     } catch (err) {
       setComments(previous);
       setError(err.message || 'Erreur');
@@ -67,29 +71,35 @@ const CommentSection = ({ eventId }) => {
         </h3>
       </div>
 
-      {/* Composer */}
-      <div className="bg-dark-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={handleKeyDown}
-          maxLength={1000}
-          rows={3}
-          placeholder="Écris un commentaire... (Ctrl+Entrée pour publier)"
-          className="w-full bg-transparent text-slate-200 placeholder-slate-500 focus:outline-none resize-none"
-        />
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-500">{draft.length}/1000</span>
-          <button
-            onClick={handlePost}
-            disabled={!draft.trim() || posting}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-white text-sm font-semibold transition-all"
-          >
-            <Send className="w-4 h-4" />
-            {posting ? 'Publication...' : 'Publier'}
-          </button>
+      {/* Composer — only shown when logged in */}
+      {isAuthenticated ? (
+        <div className="bg-dark-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={1000}
+            rows={3}
+            placeholder="Écris un commentaire... (Ctrl+Entrée pour publier)"
+            className="w-full bg-transparent text-slate-200 placeholder-slate-500 focus:outline-none resize-none"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500">{draft.length}/1000</span>
+            <button
+              onClick={handlePost}
+              disabled={!draft.trim() || posting}
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl text-white text-sm font-semibold transition-all"
+            >
+              <Send className="w-4 h-4" />
+              {posting ? 'Publication...' : 'Publier'}
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-dark-900 border border-slate-800 rounded-2xl p-4 text-center text-slate-400 text-sm">
+          Connectez-vous pour commenter cet événement.
+        </div>
+      )}
 
       {error && (
         <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
@@ -110,7 +120,7 @@ const CommentSection = ({ eventId }) => {
             <CommentItem
               key={c.id}
               comment={c}
-              canDelete={c.authorId === CURRENT_USER_ID}
+              canDelete={isAuthenticated && c.authorId === userId}
               onDelete={() => handleDelete(c.id)}
             />
           ))}

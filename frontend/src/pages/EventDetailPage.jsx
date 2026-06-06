@@ -5,12 +5,13 @@ import { eventApi } from '../services/api';
 import LikeButton from '../components/interaction/LikeButton';
 import JoinLeaveButton from '../components/interaction/JoinLeaveButton';
 import CommentSection from '../components/interaction/CommentSection';
+import { useAuth } from '../context/AuthContext';
 
-const CURRENT_USER_ID = 1; // TODO: replace with logged-in user once Issam's JWT auth is wired
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -151,7 +152,7 @@ const EventDetailPage = () => {
               <CommentSection eventId={id} />
             </div>
             
-            {event.organizerId === CURRENT_USER_ID && (
+            {user && event.organizerId === user.userId && (
               <div className="pt-6 border-t border-slate-800">
                 <button
                   onClick={handleEdit}

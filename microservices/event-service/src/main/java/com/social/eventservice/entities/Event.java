@@ -21,8 +21,10 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     private String imageBase64;
     private Long organizerId;
+    private String organizerName;
 
     // Getters
+    public String getOrganizerName() { return organizerName; }
     public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
@@ -34,6 +36,7 @@ public class Event {
     public String getImageBase64() { return imageBase64; }
 
     // Setters
+    public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
     public void setId(Long id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setDescription(String description) { this.description = description; }

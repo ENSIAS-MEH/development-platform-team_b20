@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Users, Tag, Edit2, Image as ImageIcon, X } from 'lucide-react';
 import { eventApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 const MAX_IMAGE_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 const EventForm = ({ eventId, onSuccess, onCancel }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -93,8 +95,14 @@ const EventForm = ({ eventId, onSuccess, onCancel }) => {
     setLoading(true);
     setError('');
     try {
-      if (eventId) await eventApi.updateEvent(eventId, formData);
-      else await eventApi.createEvent(formData);
+      // Include the logged-in user as organizer when creating; on edit, the backend keeps the existing organizer
+      const payload = {
+        ...formData,
+        organizerId: user?.userId,
+        organizerName: user?.fullName || user?.email || 'Anonymous',
+      };
+      if (eventId) await eventApi.updateEvent(eventId, payload);
+      else await eventApi.createEvent(payload);
       if (onSuccess) onSuccess();
     } catch (err) {
       setError("Erreur lors de l'enregistrement");
