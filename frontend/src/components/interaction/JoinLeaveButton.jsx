@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { UserPlus, UserMinus, Users } from 'lucide-react';
-import { interactionApi, CURRENT_USER_ID } from '../../services/interactionService';
+import { interactionApi } from '../../services/interactionService';
+import { useAuth } from '../../context/AuthContext';
 
 const JoinLeaveButton = ({ eventId }) => {
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?.userId;
   const [joined, setJoined] = useState(false);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -18,7 +21,7 @@ const JoinLeaveButton = ({ eventId }) => {
     try {
       const ids = await interactionApi.getParticipantIds(eventId);
       setCount(ids.length);
-      setJoined(ids.includes(CURRENT_USER_ID));
+      setJoined(userId ? ids.includes(userId) : false);
     } catch (err) {
       console.error('Failed to load participants:', err);
     } finally {
@@ -27,20 +30,18 @@ const JoinLeaveButton = ({ eventId }) => {
   };
 
   const handleClick = async () => {
+    if (!isAuthenticated) return;
     if (busy) return;
     setBusy(true);
     setError(null);
     const newJoined = !joined;
-
-    // Optimistic
     setJoined(newJoined);
     setCount(c => c + (newJoined ? 1 : -1));
 
     try {
-      if (newJoined) await interactionApi.joinEvent(eventId, CURRENT_USER_ID);
-      else await interactionApi.leaveEvent(eventId, CURRENT_USER_ID);
+      if (newJoined) await interactionApi.joinEvent(eventId, userId);
+      else await interactionApi.leaveEvent(eventId, userId);
     } catch (err) {
-      // Revert
       setJoined(!newJoined);
       setCount(c => c + (newJoined ? -1 : 1));
       setError(err.message || 'Erreur');
@@ -66,12 +67,13 @@ const JoinLeaveButton = ({ eventId }) => {
       <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={handleClick}
-          disabled={busy}
+          disabled={busy || !isAuthenticated}
+          title={!isAuthenticated ? 'Connectez-vous pour participer' : ''}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all ${
             joined
               ? 'bg-dark-900 border border-slate-700 text-slate-300 hover:border-red-500 hover:text-red-500'
               : 'bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-600/20'
-          } ${busy ? 'opacity-60 cursor-not-allowed' : ''}`}
+          } ${busy || !isAuthenticated ? 'opacity-60 cursor-not-allowed' : ''}`}
         >
           {joined ? <UserMinus className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
           <span>{joined ? 'Quitter' : 'Participer'}</span>

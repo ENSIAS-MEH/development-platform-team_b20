@@ -115,5 +115,3 @@ export const interactionApi = {
   },
 };
 
-// Temporary: hardcoded user ID until Issam's JWT auth is wired up
-export const CURRENT_USER_ID = 1;
