@@ -23,6 +23,9 @@ public class Comment {
     @Column(name = "author_id", nullable = false)
     private Long authorId;
 
+    @Column(name = "author_name")
+    private String authorName;
+
     @Column(name = "event_id", nullable = false)
     private Long eventId;
 
@@ -54,4 +57,7 @@ public class Comment {
 
     public Long getEventId() { return eventId; }
     public void setEventId(Long eventId) { this.eventId = eventId; }
+
+    public String getAuthorName() { return authorName; }
+    public void setAuthorName(String authorName) { this.authorName = authorName; }
 }

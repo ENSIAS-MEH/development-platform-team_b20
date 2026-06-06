@@ -39,10 +39,11 @@ export const eventApi = {
   },
   
   // Supprimer un événement
-  deleteEvent: async (id) => {
-    const res = await fetch(`${API_URL}/events/${id}`, { 
-      method: 'DELETE' 
-    });
+  deleteEvent: async (id, userId) => {
+    const url = userId
+      ? `${API_URL}/events/${id}?userId=${userId}`
+      : `${API_URL}/events/${id}`;
+    const res = await fetch(url, { method: 'DELETE' });
     if (!res.ok) throw new Error('Erreur suppression');
     return true;
   },

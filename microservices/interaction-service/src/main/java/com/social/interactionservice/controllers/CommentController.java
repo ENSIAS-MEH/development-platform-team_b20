@@ -15,19 +15,15 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    // TODO: replace userId param with authenticated user once JWT is in place
     @PostMapping("/api/events/{eventId}/comments")
     public ResponseEntity<?> addComment(
-            @PathVariable Long eventId,
-            @RequestParam Long userId,
-            @RequestBody Map<String, String> body) {
-        try {
-            String content = body.get("content");
-            Comment comment = commentService.addComment(eventId, userId, content);
-            return ResponseEntity.ok(comment);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        @PathVariable Long eventId,
+        @RequestParam Long userId,
+        @RequestParam(required = false) String userName,
+        @RequestBody Map<String, String> body
+    ) {
+        String content = body.get("content");
+        return ResponseEntity.ok(commentService.addComment(eventId, userId, userName, content));
     }
 
     @GetMapping("/api/events/{eventId}/comments")

@@ -17,6 +17,7 @@ import RequireAuth from './components/auth/RequireAuth';
 import RequireAdmin from './components/auth/RequireAdmin';
 import { StatsProvider } from './context/StatsContext';
 import { AuthProvider } from './context/AuthContext';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
@@ -44,6 +45,9 @@ function App() {
             } />
             <Route path="/recommendations" element={
               <RequireAuth><UserRecommendations /></RequireAuth>
+            } />
+            <Route path="/dashboard" element={
+              <RequireAuth><DashboardPage /></RequireAuth>
             } />
 
             {/* Admin-only routes */}
