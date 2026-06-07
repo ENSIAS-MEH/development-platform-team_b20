@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: smartevent
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smartevent-network
+
+  discovery-server:
+    build: ./microservices/discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - smartevent-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ./microservices/api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - smartevent-network
+
+  user-service:
+    build: ./microservices/user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smartevent
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: users
+    depends_on:
+      - postgres
+      - discovery-server
+    networks:
+      - smartevent-network
+
+  event-service:
+    build: ./microservices/event-service
+    container_name: event-service
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smartevent
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: events
+    depends_on:
+      - postgres
+      - discovery-server
+    networks:
+      - smartevent-network
+
+  interaction-service:
+    build: ./microservices/interaction-service
+    container_name: interaction-service
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smartevent
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: interactions
+    depends_on:
+      - postgres
+      - discovery-server
+    networks:
+      - smartevent-network
+
+  admin-service:
+    build: ./microservices/admin-service
+    container_name: admin-service
+    ports:
+      - "8084:8084"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smartevent
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: admin
+    depends_on:
+      - postgres
+      - discovery-server
+    networks:
+      - smartevent-network
+
+  recommendation-service:
+    build: ./microservices/recommendation-service
+    container_name: recommendation-service
+    ports:
+      - "8085:8085"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      - discovery-server
+    networks:
+      - smartevent-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - smartevent-network
+
+networks:
+  smartevent-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
