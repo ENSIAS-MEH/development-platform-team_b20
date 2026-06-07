@@ -6,7 +6,6 @@ namespace: smartevent
 resources:
   - configmap.yaml
   - secret.yaml
-  - postgres-statefulset.yaml
   - ingress.yaml
   # Ajouter ici les deployments et services de Nizar
 

@@ -13,7 +13,6 @@ data:
   DB_PORT: "5432"
   
   # URLs complètes pour Spring
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/smartevent"
   
   # Schémas par service
   USER_SCHEMA: "users"
