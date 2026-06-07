@@ -6,7 +6,7 @@ const EventList = ({ events, onEventDeleted, onEdit, currentUserId = 1 }) => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
       try {
-        await eventApi.deleteEvent(id);
+        await eventApi.deleteEvent(id, currentUserId);
         if (onEventDeleted) onEventDeleted();
       } catch (error) {
         alert('Erreur lors de la suppression');

@@ -14,7 +14,7 @@ public class CommentServiceImpl implements CommentService {
     private CommentRepository commentRepo;
 
     @Override
-    public Comment addComment(Long eventId, Long userId, String content) {
+    public Comment addComment(Long eventId, Long userId, String userName, String content) {
 
         if (content == null || content.trim().isEmpty()) {
             throw new RuntimeException("Comment cannot be empty");
@@ -25,6 +25,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Comment comment = new Comment(content.trim(), userId, eventId);
+        comment.setAuthorName(userName); // ← new line
         return commentRepo.save(comment);
     }
 

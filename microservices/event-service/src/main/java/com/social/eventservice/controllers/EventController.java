@@ -37,10 +37,15 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id, getCurrentUserId());
-        return ResponseEntity.noContent().build();
-    }
+    public ResponseEntity<Void> deleteEvent(
+        @PathVariable Long id,
+        @RequestParam(required = false) Long userId
+    ) {
+        
+    Long actorId = userId != null ? userId : getCurrentUserId();
+    eventService.deleteEvent(id, actorId);
+    return ResponseEntity.noContent().build();
+}
 
     @GetMapping("/{id}")
     public ResponseEntity<EventResponseDTO> getEventById(@PathVariable Long id) {

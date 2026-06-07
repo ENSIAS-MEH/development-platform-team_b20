@@ -5,6 +5,7 @@ import EventList from '../components/events/EventList';
 import EventSearchBar from '../components/events/EventSearchBar';
 import { eventApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard } from 'lucide-react';
 
 const EventsPage = () => {
   const navigate = useNavigate();
@@ -87,6 +88,13 @@ const EventsPage = () => {
                   <span className="text-slate-300 text-sm hidden md:inline">
                     Bonjour, <strong>{user.fullName || user.email}</strong>
                   </span>
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-dark-900 border border-slate-800 hover:border-primary-600 hover:text-primary-500 rounded-xl text-slate-300 font-semibold transition-all"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span className="hidden md:inline">Mon dashboard</span>
+                  </button>
                   <button
                     onClick={() => {
                       logout();

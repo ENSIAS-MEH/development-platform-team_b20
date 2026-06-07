@@ -14,4 +14,6 @@ public interface ParticipationService {
     List<Long> getParticipantIds(Long eventId);
 
     long countParticipants(Long eventId);
+
+    List<Long> getEventIdsByUser(Long userId);
 }

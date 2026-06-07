@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 public class ParticipationServiceImpl implements ParticipationService {
 
@@ -53,5 +54,13 @@ public class ParticipationServiceImpl implements ParticipationService {
     @Override
     public long countParticipants(Long eventId) {
         return participationRepo.countByEventId(eventId);
+    }
+
+    @Override
+    public List<Long> getEventIdsByUser(Long userId) {
+        return participationRepo.findByUserId(userId)
+                .stream()
+                .map(Participation::getEventId)
+                .collect(Collectors.toList());
     }
 }
