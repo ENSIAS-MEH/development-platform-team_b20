@@ -1,0 +1,11 @@
+---
+- name: Deploy Smart Social Event Organizer
+  hosts: local
+  become: no
+  vars_files:
+    - vars/variables.yml
+
+  roles:
+    - docker
+    - kubernetes
+    - deploy

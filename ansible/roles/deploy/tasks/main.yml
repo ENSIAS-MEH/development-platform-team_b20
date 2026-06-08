@@ -1,0 +1,30 @@
+---
+- name: Apply namespace
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/namespace.yaml
+
+- name: Apply configmap
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/configmap.yaml
+
+- name: Apply secrets
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/secret.yaml
+
+- name: Apply deployments
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/deployment/
+
+- name: Apply services
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/service/
+
+- name: Apply ingress
+  command: kubectl apply -f {{ project_path }}/kubernetes/base/ingress.yaml
+
+- name: Wait for pods to be ready
+  command: kubectl wait --for=condition=ready pod --all --timeout=120s -n smartevent
+  ignore_errors: yes
+
+- name: Check all pods status
+  command: kubectl get pods -n smartevent
+  register: pods_status
+
+- name: Display pods status
+  debug:
+    msg: "{{ pods_status.stdout }}"

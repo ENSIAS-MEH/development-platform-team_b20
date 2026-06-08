@@ -1,0 +1,14 @@
+---
+- name: Check Docker is installed
+  shell: docker --version 2>/dev/null || echo "Docker not available"
+  register: docker_version
+  changed_when: false
+  ignore_errors: yes
+
+- name: Display Docker status
+  debug:
+    msg: "Docker status: {{ docker_version.stdout }}"
+
+- name: Note about Docker images
+  debug:
+    msg: "Images already built in minikube - skipping docker-compose build"

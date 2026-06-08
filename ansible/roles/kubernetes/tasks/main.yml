@@ -1,0 +1,23 @@
+---
+- name: Check minikube is installed
+  command: minikube version
+  register: minikube_version
+  changed_when: false
+
+- name: Display minikube version
+  debug:
+    msg: "{{ minikube_version.stdout }}"
+
+- name: Check minikube status
+  command: minikube status
+  register: minikube_status
+  ignore_errors: yes
+  changed_when: false
+
+- name: Display minikube status
+  debug:
+    msg: "{{ minikube_status.stdout }}"
+
+- name: Start minikube if not running
+  command: minikube start --driver=docker
+  when: "'Running' not in minikube_status.stdout"

@@ -1,0 +1,19 @@
+project_path: /mnt/c/Users/LENOVO/Desktop/smart-social-event-organizer
+
+services:
+  - name: discovery-server
+    port: 8761
+  - name: api-gateway
+    port: 8080
+  - name: user-service
+    port: 8081
+  - name: event-service
+    port: 8082
+  - name: interaction-service
+    port: 8083
+  - name: admin-service
+    port: 8084
+  - name: recommendation-service
+    port: 8085
+  - name: frontend
+    port: 3000
