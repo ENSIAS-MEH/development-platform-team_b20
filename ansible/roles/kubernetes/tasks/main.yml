@@ -1,23 +1,25 @@
 ---
-- name: Check minikube is installed
-  command: minikube version
-  register: minikube_version
+- name: Check kubectl via minikube
+  shell: '"/mnt/c/Program Files/Kubernetes/Minikube/minikube.exe" kubectl -- version --client'
+  register: kubectl_version
   changed_when: false
+  ignore_errors: yes
 
-- name: Display minikube version
+- name: Display kubectl version
   debug:
-    msg: "{{ minikube_version.stdout }}"
+    msg: "{{ kubectl_version.stdout }}"
 
 - name: Check minikube status
-  command: minikube status
+  shell: '"/mnt/c/Program Files/Kubernetes/Minikube/minikube.exe" status'
   register: minikube_status
-  ignore_errors: yes
   changed_when: false
+  ignore_errors: yes
 
 - name: Display minikube status
   debug:
     msg: "{{ minikube_status.stdout }}"
 
 - name: Start minikube if not running
-  command: minikube start --driver=docker
+  shell: '"/mnt/c/Program Files/Kubernetes/Minikube/minikube.exe" start --driver=docker'
   when: "'Running' not in minikube_status.stdout"
+  ignore_errors: yes
