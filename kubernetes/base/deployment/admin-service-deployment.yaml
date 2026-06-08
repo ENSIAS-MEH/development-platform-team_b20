@@ -15,21 +15,25 @@ spec:
     spec:
       containers:
       - name: admin-service
-        image: development-platform-team_b20-admin-service:latest
-        imagePullPolicy: IfNotPresent
+        image: admin-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8084
         env:
-        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-          value: "http://discovery-server:8761/eureka/"
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://db.clngjxlkalfnmwnggnxz.supabase.co:5432/postgres"
-        - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres.clngjxlkalfnmwnggnxz"
-        - name: SPRING_DATASOURCE_PASSWORD
-          value: "hatimBH12345@"
-        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
-          value: "admin_schema"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://db.clngjxlkalfnmwnggnxz.supabase.co:6543/postgres?currentSchema=admin_schema"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres.clngjxlkalfnmwnggnxz"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "hatimBH12345@"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://discovery-server:8761/eureka/"
+            - name: SPRING_JPA_DATABASE_PLATFORM
+              value: "org.hibernate.dialect.PostgreSQLDialect"
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
+              value: "admin_schema"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "admin-service"
         resources:
           requests:
             memory: "512Mi"

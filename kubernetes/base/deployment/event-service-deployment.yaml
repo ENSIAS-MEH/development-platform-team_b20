@@ -15,21 +15,23 @@ spec:
     spec:
       containers:
       - name: event-service
-        image: development-platform-team_b20-event-service:latest
-        imagePullPolicy: IfNotPresent
+        image: event-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8082
         env:
-        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-          value: "http://discovery-server:8761/eureka/"
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://db.clngjxlkalfnmwnggnxz.supabase.co:5432/postgres"
+          value: "jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require&currentSchema=events_schema"
         - name: SPRING_DATASOURCE_USERNAME
           value: "postgres.clngjxlkalfnmwnggnxz"
         - name: SPRING_DATASOURCE_PASSWORD
           value: "hatimBH12345@"
-        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
-          value: "events_schema"
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: "http://discovery-server:8761/eureka/"
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          value: "org.hibernate.dialect.PostgreSQLDialect"
+        - name: EUREKA_INSTANCE_HOSTNAME
+          value: "event-service"
         resources:
           requests:
             memory: "512Mi"

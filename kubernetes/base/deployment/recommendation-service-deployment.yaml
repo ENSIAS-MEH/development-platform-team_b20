@@ -15,21 +15,23 @@ spec:
     spec:
       containers:
       - name: recommendation-service
-        image: development-platform-team_b20-recommendation-service:latest
-        imagePullPolicy: IfNotPresent
+        image: recommendation-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8085
         env:
-        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-          value: "http://discovery-server:8761/eureka/"
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://db.clngjxlkalfnmwnggnxz.supabase.co:5432/postgres"
+          value: "jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require&currentSchema=recommendation_schema"
         - name: SPRING_DATASOURCE_USERNAME
           value: "postgres.clngjxlkalfnmwnggnxz"
         - name: SPRING_DATASOURCE_PASSWORD
           value: "hatimBH12345@"
-        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
-          value: "recommendation_schema"
+        - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          value: "http://discovery-server:8761/eureka/"
+        - name: SPRING_JPA_DATABASE_PLATFORM
+          value: "org.hibernate.dialect.PostgreSQLDialect"
+        - name: EUREKA_INSTANCE_HOSTNAME
+          value: "recommendation-service"
         resources:
           requests:
             memory: "256Mi"
