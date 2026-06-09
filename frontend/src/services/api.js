@@ -1,5 +1,5 @@
-const GATEWAY_URL = 'http://localhost:8080';
-const API_URL = 'http://localhost:8080/event-service/api';
+const GATEWAY_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = `${import.meta.env.VITE_API_URL || ''}/event-service/api`;
 
 export const eventApi = {
   // Récupérer tous les événements
@@ -121,7 +121,8 @@ export const interactionApi = {
 export const recommendationApi = {
   getRecommendations: async (userId) => {
     // ON REPASSE PAR LA GATEWAY (8080)
-    const res = await fetch(`http://localhost:8080/recommendation-service/api/recommendations/user/${userId}`);
+    const BASE = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${BASE}/recommendation-service/api/recommendations/user/${userId}`);
     if (!res.ok) return [];
     return res.json();
   }

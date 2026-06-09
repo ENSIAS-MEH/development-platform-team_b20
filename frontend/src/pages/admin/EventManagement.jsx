@@ -39,11 +39,12 @@ const EventManagement = () => {
         const participantsData = await interactionApi.getParticipants(event.id);
         
         // Pour les likes, on appelle l'URL qui renvoie {"count": X}
-        const likesRes = await fetch(`http://localhost:8080/interaction-service/api/events/${event.id}/likes`);
+        const BASE = import.meta.env.VITE_API_URL || '';
+        const likesRes = await fetch(`${BASE}/interaction-service/api/events/${event.id}/likes`);
         const likesData = await likesRes.json();
 
         // Pour les commentaires, on compte la taille de la liste renvoyée
-        const commsRes = await fetch(`http://localhost:8080/interaction-service/api/events/${event.id}/comments`);
+        const commsRes = await fetch(`${BASE}/interaction-service/api/events/${event.id}/comments`);
         const commsData = await commsRes.json();
 
         setStats({ 

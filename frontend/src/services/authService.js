@@ -1,6 +1,6 @@
 // All auth calls go directly to user-service for now (not through gateway).
 // Will switch to gateway when full stack stabilizes.
-const API_URL = 'http://localhost:8081/api/auth';
+const API_URL = `${import.meta.env.VITE_API_URL || ''}/user-service/api/auth`;
 
 export const authService = {
 

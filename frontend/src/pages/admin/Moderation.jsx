@@ -16,7 +16,8 @@ const Moderation = () => {
     try {
       // Note : Assure-toi que ton service Admin appelle bien Hamza 
       // pour récupérer TOUS les commentaires (même les HIDDEN)
-      const res = await fetch('http://localhost:8080/admin-service/api/admin/dashboard/comments');
+  const BASE = import.meta.env.VITE_API_URL || '';
+  const res = await fetch(`${BASE}/admin-service/api/admin/dashboard/comments`);
       if (res.ok) {
         const data = await res.json();
         setComments(Array.isArray(data) ? data : []);
@@ -40,7 +41,8 @@ const Moderation = () => {
     if(window.confirm(actionMsg)) {
         try {
             // Appel à la Gateway
-            const response = await fetch(`http://localhost:8080/admin-service/api/admin/dashboard/comments/${commentId}/hide`, { 
+           const BASE = import.meta.env.VITE_API_URL || '';
+            const response = await fetch(`${BASE}/admin-service/api/admin/dashboard/comments/${commentId}/hide`, { 
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' }
             });

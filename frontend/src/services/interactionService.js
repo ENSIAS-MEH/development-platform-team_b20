@@ -4,7 +4,7 @@
 // =====================================================================
 // TODO: replace `userId` parameters with the authenticated user once JWT lands
 
-const API_URL = 'http://localhost:8080/interaction-service/api';
+const API_URL = `${import.meta.env.VITE_API_URL || ''}/interaction-service/api`;
 
 // Helper: build query string from params
 const qs = (params) => {
